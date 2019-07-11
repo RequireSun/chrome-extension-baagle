@@ -7,9 +7,18 @@
   "version": "0.1.0",
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
+  "content_scripts": [
+    {
+      "matches": ["*://www.google.com/*"],
+      "css": ["css/index.modifier.css"],
+      "js": ["index.modifier.js"]
+    }
+  ],
+
   "permissions": [
     "storage",
-    "contextMenus"
+    "contextMenus",
+    "*://www.google.com/"
   ],
 
   "icons": {
@@ -19,7 +28,6 @@
   },
 
   "browser_action": {
-    "default_title": "__MSG_appBrowserActionDefaultTitle__",
     "default_popup": "popup.html"
   },
 

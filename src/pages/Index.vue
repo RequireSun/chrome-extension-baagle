@@ -11,3 +11,5 @@ import {
 @Component
 export default class Index extends Vue {}
 </script>
+
+<style lang="css" rel="stylesheet" src="../styles/index.modifier.css" />
