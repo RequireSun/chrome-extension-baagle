@@ -9,6 +9,27 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+// CSS入口配置
+var CSS_PATH = {
+    css: {
+        pattern: ['./src/**/[^_]*.less', '!./src/old/**/*.less'],
+        src: path.join(__dirname, 'src'),
+        dst: path.resolve(__dirname, 'static/build/webpack'),
+    }
+}
+
+// 遍历除所有需要打包的CSS文件路径
+function getCSSEntries(config) {
+    var fileList = glob.sync(config.pattern)
+    return fileList.reduce(function (previous, current) {
+        var filePath = path.parse(path.relative(config.src, current))
+        var withoutSuffix = path.join(filePath.dir, filePath.name)
+        previous[withoutSuffix] = path.resolve(__dirname, current)
+        return previous
+    }, {})
+}
+// https://www.jianshu.com/p/439764e3eff2
+
 module.exports = {
     // 因为这个项目是打包发布的 app, 不是线上资源, 所以不需要哈希
     filenameHashing: false,
@@ -28,39 +49,13 @@ module.exports = {
     // 开发的时候为 true, 发布时为 false
     productionSourceMap: 'development' === process.env.NODE_ENV,
     configureWebpack: {
-        module: {
-            rules: [{
-                test: /\.css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader?importLoaders=1',
-                    // 'postcss-loader',
-                    // 'less-loader',
-                ],
-            }],
-        },
         plugins: [
             new CopyWebpackPlugin([
                 { from: 'public/manifest.json', to: 'manifest.json', },
                 { from: 'src/image/*.png', to: 'image/[name].png', },
             ]),
-            // new MiniCssExtractPlugin({
-            //     filename: '[name].css',
-            //     chunkFilename: '[id].css',
-            // }),
         ],
     },
-    // css相关配置
-    // css: {
-    //     // 是否使用css分离插件 ExtractTextPlugin
-    //     extract: true,
-    //     // 开启 CSS source maps?
-    //     sourceMap: false,
-    //     // css预设器配置项
-    //     loaderOptions: {},
-    //     // 启用 CSS modules for all css / pre-processor files.
-    //     modules: false
-    // },
     // chainWebpack 修改编译目标目录
     // https://segmentfault.com/q/1010000016475212
     chainWebpack: config => {
